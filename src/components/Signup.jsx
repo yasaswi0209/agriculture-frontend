@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+// 🔥 Add Base URL here (change only once)
+const BASE_URL = "http://localhost:8080";
+
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -8,16 +11,19 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const signup = async (username, email, password) => {
-    const signupUrl = "http://localhost:9090/auth/signup";
+    const signupUrl = `${BASE_URL}/auth/signup`;
+
     const response = await fetch(signupUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),
     });
+
     if (!response.ok) {
       const errorMessage = await response.text();
       throw new Error(errorMessage || "Signup failed");
     }
+
     return response.text();
   };
 
@@ -37,7 +43,7 @@ const Signup = () => {
         body {
           min-height: 100vh;
           min-width:100vh;
-           background: linear-gradient(#051f30, #000000);
+          background: linear-gradient(#051f30, #000000);
         }
         .signup-bg {
           min-height: 100vh;
@@ -50,7 +56,6 @@ const Signup = () => {
         .auth-container {
           background: #fff;
           border-radius: 16px;
-          
           padding: 40px 32px 28px 32px;
           max-width: 350px;
           width: 100%;
@@ -112,14 +117,37 @@ const Signup = () => {
           text-decoration: underline;
         }
       `}</style>
+
       <div className="signup-bg">
         <div className="auth-container">
           <h2>Sign Up</h2>
-          <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
           <button onClick={handleSignup}>Sign Up</button>
-          <p>Already have an account? <Link to="/login">Login</Link></p>
+
+          <p>
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
         </div>
       </div>
     </>

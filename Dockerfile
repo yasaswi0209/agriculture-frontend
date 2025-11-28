@@ -1,26 +1,25 @@
-# Stage 1 - Build the Vite app
-FROM node:18-alpine AS build
+# Step 1: Build Vite production bundle
+FROM node:18 AS build
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+RUN apt-get update && apt-get install -y git
+
+# Clone your repo
+RUN git clone https://github.com/yasaswi0209/agriculture-frontend.git .
 
 # Install dependencies
 RUN npm install
 
-# Copy all project files
-COPY . .
+# FIX: Give Vite execute permission
+RUN chmod +x node_modules/.bin/vite
 
-# Build the app (Vite outputs to /app/dist)
+# Build Vite project
 RUN npm run build
 
-# Stage 2 - Serve with Nginx
-FROM nginx:stable-alpine
+# Step 2: Serve with nginx
+FROM nginx:alpine
 
-# Copy custom nginx config (make sure nginx.conf exists in agriculture-front)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy the Vite dist folder into Nginx html folder
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

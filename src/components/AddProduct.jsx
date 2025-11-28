@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+// 🔥 Base URL (change only once)
+const BASE_URL = "http://localhost:8080";
+
 const AddProduct = () => {
   const [product, setProduct] = useState({
     name: "",
@@ -51,7 +54,7 @@ const AddProduct = () => {
     formData.append("brand", product.brand);
 
     try {
-      await axios.post("http://localhost:9090/api/products/upload", formData, {
+      await axios.post(`${BASE_URL}/api/products/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
@@ -97,7 +100,6 @@ const AddProduct = () => {
       </h2>
 
       <form onSubmit={handleSubmit}>
-
         {/* FORM FIELD STYLE */}
         {[
           { label: "Product Name", name: "name", type: "text" },
@@ -108,7 +110,14 @@ const AddProduct = () => {
           { label: "Brand", name: "brand", type: "text" },
         ].map((field, index) => (
           <div key={index} style={{ marginBottom: "20px" }}>
-            <label style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}>
+            <label
+              style={{
+                fontSize: "15px",
+                color: "#444",
+                marginBottom: "8px",
+                display: "block",
+              }}
+            >
               {field.label}
             </label>
             <input
@@ -131,7 +140,9 @@ const AddProduct = () => {
         ))}
 
         {/* CATEGORY */}
-        <label style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}>
+        <label
+          style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}
+        >
           Category
         </label>
         <select
@@ -159,7 +170,9 @@ const AddProduct = () => {
         </select>
 
         {/* DESCRIPTION */}
-        <label style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}>
+        <label
+          style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}
+        >
           Description
         </label>
         <textarea
@@ -180,7 +193,9 @@ const AddProduct = () => {
         />
 
         {/* IMAGE UPLOAD */}
-        <label style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}>
+        <label
+          style={{ fontSize: "15px", color: "#444", marginBottom: "8px", display: "block" }}
+        >
           Upload Image
         </label>
         <input

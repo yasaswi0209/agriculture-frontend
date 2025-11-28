@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
-const IMAGE_BASE_URL = 'http://localhost:9090/api/products/images';
+// Backend base URL from Vite
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+// Image URL
+const IMAGE_BASE_URL = `${API_BASE_URL}/api/products/images`;
 
 const Grains = () => {
   const [grains, setGrains] = useState([]);
@@ -15,19 +19,25 @@ const Grains = () => {
     const fetchGrains = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9090/api/products/grains');
+
+        // Correct backend API call
+        const response = await fetch(`${API_BASE_URL}/api/products/grains`);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+
         const data = await response.json();
         setGrains(data);
         setError(null);
       } catch (error) {
+        console.error(error);
         setError('Failed to load grains. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchGrains();
   }, []);
 
@@ -77,7 +87,7 @@ const Grains = () => {
                 />
               </div>
 
-              {/* DESCRIPTION BOX */}
+              {/* DESCRIPTION */}
               <input
                 type="text"
                 value={grain.description || ""}
@@ -96,13 +106,12 @@ const Grains = () => {
                 }}
               />
 
-              {/* PRODUCT INFO */}
+              {/* PRODUCT DETAILS */}
               <div className="product-info">
                 <h4 style={{ margin: '10px 0 5px 0' }}>
                   {grain.name || 'Unknown Grain'}
                 </h4>
 
-                {/* PRICE WITH ₹ FORMAT */}
                 <p
                   className="price"
                   style={{

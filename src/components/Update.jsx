@@ -1,153 +1,109 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
-const Update = () => {
+// 🔥 Base URL (change only once)
+const BASE_URL = 'http://localhost:8080';
+
+// Image URL using BASE_URL
+const IMAGE_BASE_URL = `${BASE_URL}/api/products/images`;
+
+const SpecialtyAndLocalProducts = () => {
   const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [newPrice, setNewPrice] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
-  // Load all products
+  // Fetch products of category 'specialty_local' from backend
   useEffect(() => {
-    axios
-      .get("http://localhost:9090/api/products")
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.log(err));
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(`${BASE_URL}/api/products/specialty_local`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Fetched specialty and local products:', data);
+        setProducts(data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching specialty and local products:', error);
+        setError('Failed to load specialty and local products. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
-  // When user selects a product
-  const handleSelect = (event) => {
-    const productId = event.target.value;
-    const product = products.find((p) => p.id == productId);
-    setSelectedProduct(product);
-    if (product) setNewPrice(product.price);
-  };
-
-  // Update API call
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-
-    if (!selectedProduct) {
-      alert("Select a product first!");
+  // Handle adding product to cart
+  const handleAddToCart = (product) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please login to add items to the cart!');
+      navigate('/login');
       return;
     }
 
-    try {
-      await axios.put(
-        `http://localhost:9090/api/products/${selectedProduct.id}`,
-        { price: newPrice } // sending only price
-      );
-
-      alert("Price updated successfully!");
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
-      alert("Update failed!");
-    }
+    addToCart(product);
+    alert(`${product.name} added to cart!`);
+    navigate('/cart');
   };
 
+  if (loading) {
+    return <div className="product-container">Loading specialty and local products...</div>;
+  }
+
+  if (error) {
+    return <div className="product-container error">{error}</div>;
+  }
+
   return (
-    <div
-      style={{
-        maxWidth: "700px",
-        margin: "40px auto",
-        padding: "30px",
-        background: "#f0f4f8",
-        borderRadius: "12px",
-        boxShadow: "0px 4px 20px rgba(0,0,0,0.15)",
-        textAlign: "center",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <h2 style={{ marginBottom: "20px", fontSize: "28px", color: "#333" }}>
-        Update Product Price
-      </h2>
-
-      {/* Product Dropdown */}
-      <select
-        onChange={handleSelect}
-        style={{
-          width: "100%",
-          padding: "12px",
-          fontSize: "16px",
-          borderRadius: "8px",
-          border: "2px solid #ccc",
-          color: "#fff",
-          background: "#2c2c2c",
-          marginBottom: "25px",
-          cursor: "pointer",
-        }}
-      >
-        <option value="" style={{ color: "#000" }}>Select Product</option>
-        {products.map((p) => (
-          <option key={p.id} value={p.id} style={{ color: "#000" }}>
-            {p.name} (₹{p.price})
-          </option>
-        ))}
-      </select>
-
-      {/* Edit Form */}
-      {selectedProduct && (
-        <form
-          onSubmit={handleUpdate}
-          style={{
-            background: "#ffffff",
-            padding: "20px",
-            borderRadius: "10px",
-            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
-            marginTop: "20px",
-            textAlign: "left",
-          }}
-        >
-          <h3
-            style={{
-              marginBottom: "15px",
-              color: "#222",
-              fontSize: "20px",
-              textAlign: "center",
-            }}
-          >
-            Editing: <span style={{ color: "#1e90ff" }}>{selectedProduct.name}</span>
-          </h3>
-
-          {/* Price Input */}
-          <label style={{ fontSize: "16px", fontWeight: "bold", color: "#444" }}>
-            New Price (₹)
-          </label>
-          <input
-            type="number"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginTop: "10px",
-              borderRadius: "8px",
-              border: "2px solid #ccc",
-              fontSize: "16px",
-            }}
-          />
-
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginTop: "20px",
-              background: "#1e90ff",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "18px",
-              cursor: "pointer",
-            }}
-          >
-            Update Price
-          </button>
-        </form>
-      )}
+    <div className="product-container">
+      <h2>Available Specialty and Local Products</h2>
+      <div className="product-grid">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <div key={product.id} className="product-card">
+              <div className="image-container">
+                <img
+                  src={`${IMAGE_BASE_URL}/${product.imagePath}`}
+                  alt={product.name || 'Product'}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderRadius: '8px 8px 0 0',
+                    display: 'block',
+                  }}
+                />
+              </div>
+              <div className="product-info">
+                <h4 style={{ margin: '10px 0 5px 0' }}>{product.name || 'Unknown Product'}</h4>
+                <p className="price" style={{ margin: '5px 0 10px 0' }}>
+                  ₹{product.price ? product.price.toFixed(2) : '0.00'}
+                </p>
+                <button
+                  className="add-to-cart-btn"
+                  style={{ margin: '0 0 10px 0' }}
+                  onClick={() => handleAddToCart(product)}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No specialty and local products available at the moment.</p>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Update;
+export default SpecialtyAndLocalProducts;

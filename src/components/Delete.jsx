@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:9090/api/products";
+// 🔥 Base URLs (change only once)
+const BASE_URL = "http://localhost:8080";
+const API_URL = `${BASE_URL}/api/products`;
 
 const DeleteProduct = () => {
   const [category, setCategory] = useState("Crops");
@@ -25,7 +27,7 @@ const DeleteProduct = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/${category}`);
+      const res = await axios.get(`${API_URL}/${category}`);
       setProducts(res.data || []);
     } catch (err) {
       console.error("Error loading products", err);
@@ -44,7 +46,7 @@ const DeleteProduct = () => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      await axios.delete(`${API}/${id}`);
+      await axios.delete(`${API_URL}/${id}`);
       alert("Product deleted successfully!");
       fetchProducts();
     } catch (err) {

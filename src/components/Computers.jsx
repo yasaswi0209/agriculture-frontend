@@ -2,58 +2,60 @@ import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
-// Base URL for fetching product images
-const IMAGE_BASE_URL = 'http://localhost:9090/api/products/images';
+// Use Kubernetes backend URL from Vite
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-const FruitsProducts = () => {
-  const [products, setProducts] = useState([]);
+// Image base URL
+const IMAGE_BASE_URL = `${API_BASE_URL}/api/products/images`;
+
+const Crops = () => {
+  const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  // Fetch products of category 'fruits'
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCrops = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9090/api/products/fruits');
+
+        const response = await fetch(`${API_BASE_URL}/api/products/crops`);
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Fetched products:', data);
-        setProducts(data);
+        setCrops(data);
         setError(null);
-      } catch (error) {
-        console.error('Error fetching fruits:', error);
-        setError('Failed to load fruits. Please try again later.');
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load crops. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchCrops();
   }, []);
 
-  // Handle add to cart
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (crop) => {
     const token = localStorage.getItem('token');
+
     if (!token) {
       alert('Please login to add items to the cart!');
       navigate('/login');
       return;
     }
 
-    addToCart(product);
-    alert(`${product.name} added to cart!`);
+    addToCart(crop);
+    alert(`${crop.name} added to cart!`);
     navigate('/cart');
   };
 
   if (loading) {
-    return <div className="product-container">Loading fruits...</div>;
+    return <div className="product-container">Loading crops...</div>;
   }
 
   if (error) {
@@ -62,35 +64,31 @@ const FruitsProducts = () => {
 
   return (
     <div className="product-container">
-      <h2 style={{ textAlign: "center", marginBottom: "32px" }}>Available Fruits</h2>
-
+      <h2 style={{ textAlign: 'center', marginBottom: '32px' }}>Available Crops</h2>
       <div className="product-grid">
-        {products.length > 0 ? (
-          products.map((product) => (
-            <div key={product.id} className="product-card">
-
-              {/* IMAGE */}
+        {crops.length > 0 ? (
+          crops.map((crop) => (
+            <div key={crop.id} className="product-card">
               <div className="image-container">
                 <img
-                  src={`${IMAGE_BASE_URL}/${product.imagePath}`}
-                  alt={product.name || 'Product'}
+                  src={`${IMAGE_BASE_URL}/${crop.imagePath}`}
+                  alt={crop.name || 'Crop'}
                   style={{
                     width: '100%',
                     height: '200px',
                     objectFit: 'cover',
                     borderRadius: '8px 8px 0 0',
-                    display: 'block'
+                    display: 'block',
+                    backgroundColor: '#f5f5f5',
                   }}
                 />
               </div>
 
-              {/* PRODUCT INFO */}
               <div className="product-info">
                 <h4 style={{ margin: '10px 0 5px 0' }}>
-                  {product.name || 'Unknown Product'}
+                  {crop.name || 'Unknown Crop'}
                 </h4>
 
-                {/* PRICE WITH ₹ FORMAT */}
                 <p
                   className="price"
                   style={{
@@ -100,13 +98,13 @@ const FruitsProducts = () => {
                     color: '#1e90ff',
                   }}
                 >
-                  ₹ {product.price ? Number(product.price).toLocaleString('en-IN') : '0.00'}
+                  ₹ {crop.price ? Number(crop.price).toLocaleString('en-IN') : '0.00'}
                 </p>
 
                 <button
                   className="add-to-cart-btn"
                   style={{ margin: '0 0 10px 0' }}
-                  onClick={() => handleAddToCart(product)}
+                  onClick={() => handleAddToCart(crop)}
                 >
                   Add to Cart
                 </button>
@@ -114,11 +112,11 @@ const FruitsProducts = () => {
             </div>
           ))
         ) : (
-          <p>No fruits available at the moment.</p>
+          <p>No crops available at the moment.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default FruitsProducts;
+export default Crops;

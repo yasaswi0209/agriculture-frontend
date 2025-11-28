@@ -42,7 +42,8 @@ function App() {
   
   return (
     <>
-      <BrowserRouter basename="/frontapp1">
+      <BrowserRouter basename="/">
+
         <Routes>
           <Route path="/" element={<HomePage />}>
 

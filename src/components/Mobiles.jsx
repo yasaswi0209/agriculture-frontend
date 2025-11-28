@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
-const IMAGE_BASE_URL = 'http://localhost:9090/api/products/images';
+// 🔥 Base URLs
+const BASE_URL = "http://localhost:8080";
+const IMAGE_BASE_URL = `${BASE_URL}/api/products/images`;
+const VEG_URL = `${BASE_URL}/api/products/vegetables`;
 
 const Vegetables = () => {
   const [vegetables, setVegetables] = useState([]);
@@ -15,15 +18,17 @@ const Vegetables = () => {
     const fetchVegetables = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9090/api/products/vegetables');
+
+        const response = await fetch(VEG_URL);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+
         const data = await response.json();
         setVegetables(data);
         setError(null);
       } catch (err) {
-        setError('Failed to load vegetables. Please try again later.');
+        setError("Failed to load vegetables. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -33,19 +38,22 @@ const Vegetables = () => {
   }, []);
 
   const handleAddToCart = (veg) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      alert('Please login to add items to the cart!');
-      navigate('/login');
+      alert("Please login to add items to the cart!");
+      navigate("/login");
       return;
     }
+
     addToCart(veg);
     alert(`${veg.name} added to cart!`);
-    navigate('/cart');
+    navigate("/cart");
   };
 
-  if (loading) return <div className="product-container">Loading vegetables...</div>;
-  if (error) return <div className="product-container error">{error}</div>;
+  if (loading)
+    return <div className="product-container">Loading vegetables...</div>;
+  if (error)
+    return <div className="product-container error">{error}</div>;
 
   return (
     <div className="product-container">
@@ -57,24 +65,29 @@ const Vegetables = () => {
               <div className="image-container">
                 <img
                   src={`${IMAGE_BASE_URL}/${veg.imagePath}`}
-                  alt={veg.name || 'Vegetable'}
+                  alt={veg.name || "Vegetable"}
                   style={{
-                    width: '100%',
-                    height: '200px',
-                    objectFit: 'cover',
-                    borderRadius: '8px 8px 0 0',
-                    display: 'block'
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px 8px 0 0",
+                    display: "block",
                   }}
                 />
               </div>
+
               <div className="product-info">
-                <h4 style={{ margin: '10px 0 5px 0' }}>{veg.name || 'Unknown Vegetable'}</h4>
-                <p className="price" style={{ margin: '5px 0 10px 0' }}>
-                  ${veg.price ? veg.price.toFixed(2) : '0.00'}
+                <h4 style={{ margin: "10px 0 5px 0" }}>
+                  {veg.name || "Unknown Vegetable"}
+                </h4>
+
+                <p className="price" style={{ margin: "5px 0 10px 0" }}>
+                  ₹{veg.price ? veg.price.toFixed(2) : "0.00"}
                 </p>
+
                 <button
                   className="add-to-cart-btn"
-                  style={{ margin: '0 0 10px 0' }}
+                  style={{ margin: "0 0 10px 0" }}
                   onClick={() => handleAddToCart(veg)}
                 >
                   Add to Cart

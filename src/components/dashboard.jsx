@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 
+// 🔥 Base URL (change only once)
+const BASE_URL = "http://localhost:8080";
+const PRODUCTS_URL = `${BASE_URL}/api/products`;
+
 function Dashboard() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Replace with your actual API endpoint
-    fetch('http://localhost:9090/api/products')
+    fetch(PRODUCTS_URL)
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
@@ -41,6 +44,7 @@ function Dashboard() {
               </td>
             </tr>
           )}
+
           {products.map(({ id, name, description, price, stock }) => (
             <tr key={id}>
               <td>{id}</td>

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const IMAGE_BASE_URL = "http://localhost:9090/api/products/images";
+// 🔥 Base URLs
+const BASE_URL = "http://localhost:8080";
+const IMAGE_BASE_URL = `${BASE_URL}/api/products/images`;
+const ORDERS_URL = `${BASE_URL}/api/orders/user`;
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const userId = localStorage.getItem("userId");  // MySQL user ID stored after login
+  const userId = localStorage.getItem("userId"); // user ID stored after login
 
   useEffect(() => {
     if (!userId) {
@@ -16,7 +19,7 @@ const Orders = () => {
     }
 
     axios
-      .get(`http://localhost:9090/api/orders/user/${userId}`)
+      .get(`${ORDERS_URL}/${userId}`)
       .then((res) => {
         setOrders(res.data || []);
         setLoading(false);

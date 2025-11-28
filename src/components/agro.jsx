@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 // Base URL for fetching product images
-const IMAGE_BASE_URL = 'http://localhost:9090/api/products/images';
+const IMAGE_BASE_URL = 'http://localhost:8080/api/products/images';
 
 const AgroProcessedProducts = () => {
   const [products, setProducts] = useState([]);
@@ -17,7 +17,7 @@ const AgroProcessedProducts = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9090/api/products/agro_processed');
+        const response = await fetch('http://localhost:8080/api/products/agro_processed');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

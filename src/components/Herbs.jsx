@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
-// Base URL for fetching herb images (same as grains/crops)
-const IMAGE_BASE_URL = 'http://localhost:9090/api/products/images';
+// 🔥 Base URL
+const BASE_URL = "http://localhost:8080";
+const IMAGE_BASE_URL = `${BASE_URL}/api/products/images`;
+const HERBS_URL = `${BASE_URL}/api/products/herbs`;
 
 const Herbs = () => {
   const [herbs, setHerbs] = useState([]);
@@ -12,22 +14,25 @@ const Herbs = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  // Fetch products of category 'herbs' using same URL pattern
+  // Fetch all herb products
   useEffect(() => {
     const fetchHerbs = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9090/api/products/herbs'); // endpoint for herbs
+
+        const response = await fetch(HERBS_URL);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+
         const data = await response.json();
-        console.log('Fetched herbs:', data); // Debug log
+        console.log("Fetched herbs:", data);
+
         setHerbs(data);
         setError(null);
       } catch (error) {
-        console.error('Error fetching herbs:', error);
-        setError('Failed to load herbs. Please try again later.');
+        console.error("Error fetching herbs:", error);
+        setError("Failed to load herbs. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -36,18 +41,19 @@ const Herbs = () => {
     fetchHerbs();
   }, []);
 
-  // Handle adding herb to cart
+  // Add herb to cart
   const handleAddToCart = (herb) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      alert('Please login to add items to the cart!');
-      navigate('/login');
+      alert("Please login to add items to the cart!");
+      navigate("/login");
       return;
     }
 
     addToCart(herb);
     alert(`${herb.name} added to cart!`);
-    navigate('/cart');
+    navigate("/cart");
   };
 
   if (loading) {
@@ -68,24 +74,29 @@ const Herbs = () => {
               <div className="image-container">
                 <img
                   src={`${IMAGE_BASE_URL}/${herb.imagePath}`}
-                  alt={herb.name || 'Herb'}
+                  alt={herb.name || "Herb"}
                   style={{
-                    width: '100%',
-                    height: '200px',
-                    objectFit: 'cover',
-                    borderRadius: '8px 8px 0 0',
-                    display: 'block',
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px 8px 0 0",
+                    display: "block",
                   }}
                 />
               </div>
+
               <div className="product-info">
-                <h4 style={{ margin: '10px 0 5px 0' }}>{herb.name || 'Unknown Herb'}</h4>
-                <p className="price" style={{ margin: '5px 0 10px 0' }}>
-                  ${herb.price ? herb.price.toFixed(2) : '0.00'}
+                <h4 style={{ margin: "10px 0 5px 0" }}>
+                  {herb.name || "Unknown Herb"}
+                </h4>
+
+                <p className="price" style={{ margin: "5px 0 10px 0" }}>
+                  ₹{herb.price ? herb.price.toFixed(2) : "0.00"}
                 </p>
+
                 <button
                   className="add-to-cart-btn"
-                  style={{ margin: '0 0 10px 0' }}
+                  style={{ margin: "0 0 10px 0" }}
                   onClick={() => handleAddToCart(herb)}
                 >
                   Add to Cart

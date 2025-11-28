@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
-const IMAGE_BASE_URL = 'http://localhost:9090/api/products/images';
+// 🔥 Updated Base URLs
+const BASE_URL = "http://localhost:8080";
+const IMAGE_BASE_URL = `${BASE_URL}/api/products/images`;
+const DAIRY_URL = `${BASE_URL}/api/products/dairy`;
 
 const Dairy = () => {
   const [dairy, setDairy] = useState([]);
@@ -15,7 +18,7 @@ const Dairy = () => {
     const fetchDairy = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:9090/api/products/dairy');
+        const response = await fetch(DAIRY_URL);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -23,7 +26,7 @@ const Dairy = () => {
         setDairy(data);
         setError(null);
       } catch (err) {
-        setError('Failed to load dairy products. Please try again later.');
+        setError("Failed to load dairy products. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -32,19 +35,21 @@ const Dairy = () => {
   }, []);
 
   const handleAddToCart = (item) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      alert('Please login to add items to the cart!');
-      navigate('/login');
+      alert("Please login to add items to the cart!");
+      navigate("/login");
       return;
     }
     addToCart(item);
     alert(`${item.name} added to cart!`);
-    navigate('/cart');
+    navigate("/cart");
   };
 
-  if (loading) return <div className="product-container">Loading dairy products...</div>;
-  if (error) return <div className="product-container error">{error}</div>;
+  if (loading)
+    return <div className="product-container">Loading dairy products...</div>;
+  if (error)
+    return <div className="product-container error">{error}</div>;
 
   return (
     <div className="product-container">
@@ -56,14 +61,25 @@ const Dairy = () => {
               <div className="image-container">
                 <img
                   src={`${IMAGE_BASE_URL}/${item.imagePath}`}
-                  alt={item.name || 'Dairy Product'}
+                  alt={item.name || "Dairy Product"}
                   className="product-image"
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px 8px 0 0",
+                  }}
                 />
               </div>
               <div className="product-info">
-                <h4>{item.name || 'Unknown Dairy Product'}</h4>
-                <p className="price">${item.price ? item.price.toFixed(2) : '0.00'}</p>
-                <button className="add-to-cart-btn" onClick={() => handleAddToCart(item)}>
+                <h4>{item.name || "Unknown Dairy Product"}</h4>
+                <p className="price">
+                  ₹{item.price ? item.price.toFixed(2) : "0.00"}
+                </p>
+                <button
+                  className="add-to-cart-btn"
+                  onClick={() => handleAddToCart(item)}
+                >
                   Add to Cart
                 </button>
               </div>

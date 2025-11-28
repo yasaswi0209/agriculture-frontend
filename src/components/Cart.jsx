@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "http://localhost:9090/api/products/images";
+// 🔥 Base URLs
+const BASE_URL = "http://localhost:8080";
+const IMAGE_BASE_URL = `${BASE_URL}/api/products/images`;
+const PRODUCTS_URL = `${BASE_URL}/api/products`;
 
 const Cart = () => {
   const { cartItems, addToCart, removeFromCart, updateCartQuantity } = useCart();
@@ -11,7 +14,7 @@ const Cart = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:9090/api/products")
+    fetch(PRODUCTS_URL)
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
@@ -85,35 +88,34 @@ const Cart = () => {
           ))}
         </select>
 
-       <div style={{ marginBottom: 10 }}>
-  <button
-    onClick={handleAddItem}
-    style={{
-      marginRight: 10,
-      color: "black",        // 🔥 TEXT COLOR CHANGED
-      background: "#e0e0e0", // optional for better visibility
-      padding: "8px 14px",
-      borderRadius: 6,
-      border: "1px solid #999"
-    }}
-  >
-    Add Item
-  </button>
+        <div style={{ marginBottom: 10 }}>
+          <button
+            onClick={handleAddItem}
+            style={{
+              marginRight: 10,
+              color: "black",
+              background: "#e0e0e0",
+              padding: "8px 14px",
+              borderRadius: 6,
+              border: "1px solid #999",
+            }}
+          >
+            Add Item
+          </button>
 
-  <button
-    onClick={handleClearCart}
-    style={{
-      color: "black",        // 🔥 TEXT COLOR CHANGED
-      background: "#e0e0e0", // optional
-      padding: "8px 14px",
-      borderRadius: 6,
-      border: "1px solid #999"
-    }}
-  >
-    Clear Cart
-  </button>
-</div>
-
+          <button
+            onClick={handleClearCart}
+            style={{
+              color: "black",
+              background: "#e0e0e0",
+              padding: "8px 14px",
+              borderRadius: 6,
+              border: "1px solid #999",
+            }}
+          >
+            Clear Cart
+          </button>
+        </div>
 
         {/* CART ITEMS */}
         {cartItems.length === 0 ? (
@@ -127,7 +129,7 @@ const Cart = () => {
               );
               return (
                 <div
-                  key={`${item.id}-${index}`}  // 🔥 FIXED UNIQUE KEY
+                  key={`${item.id}-${index}`}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -141,7 +143,7 @@ const Cart = () => {
                 >
                   {/* PRODUCT IMAGE */}
                   <img
-                    src={`${BASE_URL}/${cleanImagePath}`}
+                    src={`${IMAGE_BASE_URL}/${cleanImagePath}`}
                     alt={item.name}
                     style={{
                       borderRadius: 6,
@@ -180,8 +182,6 @@ const Cart = () => {
                       fontSize: 16,
                       fontWeight: "bold",
                       textAlign: "center",
-                      MozAppearance: "textfield",
-                      WebkitAppearance: "none",
                     }}
                   />
 
@@ -199,7 +199,7 @@ const Cart = () => {
                     style={{
                       marginLeft: "auto",
                       background: "red",
-                      color:"black",
+                      color: "black",
                       borderRadius: 6,
                       padding: "5px 10px",
                     }}
